@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core;
 using eGOMenu.Shared.Enums;
+using eGOMenu.Shared.Listeners;
 
 namespace eGOMenu.Shared;
 
@@ -11,10 +12,24 @@ namespace eGOMenu.Shared;
 public class MenuManager : IDisposable {
   public static MenuManager Instance { get; } = new MenuManager();
 
-  private readonly Dictionary<CCSPlayerController, MenuContext> contexts =
-    new();
+  private readonly Dictionary<CCSPlayerController, MenuContext>
+    contexts = new();
 
-  private MenuManager() { }
+  private MenuManager() { PlayerButtonsListener.Register(); }
+
+  /// <summary>
+  /// Returns true if there is an active menu open for the specified player.
+  /// </summary>
+  internal bool hasActiveMenu(CCSPlayerController player)
+    => contexts.ContainsKey(player);
+
+  /// <summary>
+  /// Attempts to get the active menu context for the specified player.
+  /// </summary>
+  internal bool tryGetContext(CCSPlayerController player,
+    out MenuContext context)
+    => contexts.TryGetValue(player, out context);
+
 
   /// <summary>
   /// Opens the specified menu for the player.  If a menu is already open
