@@ -14,6 +14,7 @@ public class MenuManager : IDisposable {
 
   private readonly Dictionary<CCSPlayerController, MenuContext>
     contexts = new();
+
   private readonly PlayerButtonsListener? buttonsListener;
 
   private MenuManager() {
@@ -45,6 +46,14 @@ public class MenuManager : IDisposable {
     var context = new MenuContext(player, menu);
     contexts[player] = context;
     context.Render();
+  }
+
+  /// <summary>
+  /// Opens a submenu for the player.
+  /// </summary>
+  public void OpenSubMenu(CCSPlayerController player, WASDMenu subMenu) {
+    if (contexts.TryGetValue(player, out var context))
+      context.OpenSubMenu(subMenu);
   }
 
   /// <summary>
