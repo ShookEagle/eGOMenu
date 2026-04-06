@@ -60,9 +60,8 @@ internal class MenuContext(CCSPlayerController player, WASDMenu menu) {
   /// Closes the menu and clears it from the player's screen.
   /// </summary>
   public void Close() {
-    // Clear the center message by sending an empty string.  Do not route
-    // the exit button back into the manager to avoid recursion.
     player.PrintToCenterHtml(string.Empty);
+    MenuManager.Instance.CloseMenu(player);
   }
 
   private void moveSelection(int delta) {
@@ -82,8 +81,9 @@ internal class MenuContext(CCSPlayerController player, WASDMenu menu) {
     var start = currentPage * menu.LinesPerPage;
     var end   = Math.Min(start + menu.LinesPerPage, menu.Lines.Count);
     var count = 0;
-    for (var i = start; i < end; i++)
+    for (var i = start; i < end; i++) {
       count += menu.Lines[i].Elements.Count(elem => elem.IsSelectable);
+    }
 
     return count;
   }

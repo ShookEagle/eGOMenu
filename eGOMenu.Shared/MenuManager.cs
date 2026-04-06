@@ -14,8 +14,12 @@ public class MenuManager : IDisposable {
 
   private readonly Dictionary<CCSPlayerController, MenuContext>
     contexts = new();
+  private readonly PlayerButtonsListener? buttonsListener;
 
-  private MenuManager() { PlayerButtonsListener.Register(); }
+  private MenuManager() {
+    buttonsListener = new PlayerButtonsListener().Register();
+    ContextCleanupListeners.Register();
+  }
 
   /// <summary>
   /// Returns true if there is an active menu open for the specified player.
@@ -41,6 +45,28 @@ public class MenuManager : IDisposable {
     var context = new MenuContext(player, menu);
     contexts[player] = context;
     context.Render();
+  }
+
+  /// <summary>
+  /// Closes the menu for the specified player. If no menu is open for this
+  /// player, this method does nothing.
+  /// </summary>
+  /// <param name="player"></param>
+  public void CloseMenu(CCSPlayerController player) {
+    if (!contexts.TryGetValue(player, out var context)) return;
+    context.Close();
+    buttonsListener?.Held.Remove(player.Slot);
+    contexts.Remove(player);
+  }
+
+  /// <summary>
+  /// Closes all open menus. 
+  /// </summary>
+  public void CloseAllMenus() {
+    foreach (var context in contexts.Values) { context.Close(); }
+
+    buttonsListener?.Held.Clear();
+    contexts.Clear();
   }
 
   /// <summary>
